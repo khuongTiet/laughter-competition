@@ -30,7 +30,9 @@ export default {
         if (user1HP <= 0 || user2HP <= 0) {
           clearInterval(battle);
 
-          if (user1HP <= 0) {
+          if (user1HP <= 0 && user2HP <= 0) {
+            this.winner = null;
+          } else if (user1HP <= 0) {
             this.winner = 1;
           } else if (user2HP <= 0) {
             this.winner = 0;
@@ -50,9 +52,9 @@ export default {
     },
     randomizeUser: function (user) {
       const random = this.getRandomSeed();
-      console.log(this.users[user]);
       this.users[user] = this.getRandomUser(random);
-      console.log(this.users[user]);
+      this.winner = null;
+      this.time = 0;
       this.$forceUpdate();
     },
   },
@@ -96,7 +98,9 @@ export default {
 
           <div class="column is-one-fifth is-offset-1 custom-center">
             {this.winner !== null && (
-              <h1>The winner is: {this.users[this.winner].name}</h1>
+              <h1 class="title">
+                The winner is: {this.users[this.winner].name}
+              </h1>
             )}
             <a class="  button is-primary" onClick={this.contest}>
               Contest

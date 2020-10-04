@@ -64,9 +64,7 @@ export default {
                   class="progress is-success"
                   value={this.battleHP}
                   max={this.hp}
-                >
-                  60%
-                </progress>
+                ></progress>
               </div>
             </div>
           </div>
@@ -78,6 +76,8 @@ export default {
             onClick={() => {
               this.randomize();
               this.getImage();
+              this.$forceUpdate();
+              this.battleHP = this.hp;
             }}
           >
             Randomize
