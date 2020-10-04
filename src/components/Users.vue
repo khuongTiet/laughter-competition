@@ -16,25 +16,19 @@ export default {
   methods: {
     contest: function () {
       let battle = setInterval(() => {
-        let user1HP = this.battleHP[0];
-        let user2HP = this.battleHP[1];
-
-        user1HP -= this.users[1].dps;
-        user2HP -= this.users[0].dps;
-
-        this.battleHP[0] = user1HP;
-        this.battleHP[1] = user2HP;
+        this.battleHP[0] -= this.users[1].dps;
+        this.battleHP[1] -= this.users[0].dps;
 
         this.time += 1;
 
-        if (user1HP <= 0 || user2HP <= 0) {
+        if (this.battleHP[0] <= 0 || this.battleHP[1] <= 0) {
           clearInterval(battle);
 
-          if (user1HP <= 0 && user2HP <= 0) {
+          if (this.battleHP[0] <= 0 && this.battleHP[1] <= 0) {
             this.winner = null;
-          } else if (user1HP <= 0) {
+          } else if (this.battleHP[0] <= 0) {
             this.winner = 1;
-          } else if (user2HP <= 0) {
+          } else if (this.battleHP[1] <= 0) {
             this.winner = 0;
           }
         }
@@ -103,6 +97,9 @@ export default {
                 The winner is: {this.users[this.winner].name}
               </h1>
             )}
+            {this.battleHP[0] <= 0 && this.battleHP[1] <= 0 ? (
+              <h1 class="title">TIED</h1>
+            ) : null}
             <a class="  button is-primary" onClick={this.contest}>
               Contest
             </a>
