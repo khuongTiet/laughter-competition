@@ -52,6 +52,7 @@ export default {
     },
     randomizeUser: function (user) {
       const random = this.getRandomSeed();
+      this.battleHP = [this.users[0].hp, this.users[1].hp];
       this.users[user] = this.getRandomUser(random);
       this.winner = null;
       this.time = 0;
