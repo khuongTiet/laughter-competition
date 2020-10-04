@@ -1,13 +1,16 @@
 <script>
 import axios from "axios";
 import User from "./User.vue";
+import Celebration from "./Celebration.vue";
 
 export default {
   data() {
     return {
+      userPool: [],
       users: [],
       battleHP: [],
       time: 0,
+      winner: null,
     };
   },
   methods: {
@@ -35,29 +38,38 @@ export default {
         }
       }, 1000);
     },
+    getRandomUser: function (seed) {
+      return {
+        name: this.userPool[seed].name,
+        hp: Math.floor(Math.random() * this.userPool[seed].name.length * 10),
+        dps: Math.floor(Math.random() * this.userPool[seed].name.length * 5),
+      };
+    },
+    getRandomSeed: function () {
+      return Math.floor(Math.random() * this.userPool.length);
+    },
+    randomizeUser: function (user) {
+      const random = this.getRandomSeed();
+      console.log(this.users[user]);
+      this.users[user] = this.getRandomUser(random);
+      console.log(this.users[user]);
+      this.$forceUpdate();
+    },
   },
   mounted() {
     axios.get("https://jsonplaceholder.typicode.com/users").then((response) => {
       if (response.data) {
-        const users = response.data;
-        const random1 = Math.floor(Math.random() * users.length);
-        let random2 = Math.floor(Math.random() * users.length);
+        this.userPool = response.data;
+        const random1 = this.getRandomSeed();
+        let random2 = this.getRandomSeed();
 
         while (random2 === random1) {
-          random2 = Math.floor(Math.random() * users.length);
+          random2 = this.getRandomSeed();
         }
 
-        const user1 = {
-          name: users[random1].name,
-          hp: Math.floor(Math.random() * users[random1].name.length * 10),
-          dps: Math.floor(Math.random() * users[random1].name.length * 5),
-        };
+        const user1 = this.getRandomUser(random1);
 
-        const user2 = {
-          name: users[random2].name,
-          hp: Math.floor(Math.random() * users[random2].name.length * 10),
-          dps: Math.floor(Math.random() * users[random2].name.length * 5),
-        };
+        const user2 = this.getRandomUser(random2);
 
         this.users = [user1, user2];
         this.battleHP = [user1.hp, user2.hp];
@@ -66,28 +78,41 @@ export default {
   },
   render() {
     return (
-      <div class="columns max-height">
-        <User
-          name={this.users[0].name}
-          hp={this.users[0].hp}
-          dps={this.users[0].dps}
-          enemyDPS={this.users[1].dps}
-          time={this.time}
-        />
-        <a
-          class="column is-one-fifth is-offset-1  button is-primary centered-button"
-          onClick={this.contest}
-        >
-          Contest
-        </a>
-        <User
-          name={this.users[1].name}
-          hp={this.users[1].hp}
-          dps={this.users[1].dps}
-          enemyDPS={this.users[0].dps}
-          time={this.time}
-        />
-        <div class="column is-one-quarter is-offset-1" />
+      <div class="centered-button">
+        {this.winner !== null && <Celebration />}
+
+        <div class="columns max-height">
+          <User
+            name={this.users[0].name}
+            hp={this.users[0].hp}
+            dps={this.users[0].dps}
+            enemyDPS={this.users[1].dps}
+            time={this.time}
+            randomize={() => {
+              console.log("calling randomize");
+              this.randomizeUser(0);
+            }}
+          />
+
+          <div class="column is-one-fifth is-offset-1 custom-center">
+            {this.winner !== null && (
+              <h1>The winner is: {this.users[this.winner].name}</h1>
+            )}
+            <a class="  button is-primary" onClick={this.contest}>
+              Contest
+            </a>
+          </div>
+
+          <User
+            name={this.users[1].name}
+            hp={this.users[1].hp}
+            dps={this.users[1].dps}
+            enemyDPS={this.users[0].dps}
+            time={this.time}
+            randomize={() => this.randomizeUser(1)}
+          />
+          <div class="column is-one-quarter is-offset-1" />
+        </div>
       </div>
     );
   },
@@ -98,7 +123,7 @@ export default {
   height: 100vh;
 }
 
-.centered-button {
+.custom-center {
   display: flex;
   flex-direction: column;
   align-self: center;
